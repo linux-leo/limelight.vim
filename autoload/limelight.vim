@@ -135,37 +135,8 @@ function! s:coeff(coeff)
 endfunction
 
 function! s:dim(coeff)
-  let synid = synIDtrans(hlID('Normal'))
-  let fg = synIDattr(synid, 'fg#')
-  let bg = synIDattr(synid, 'bg#')
-  let bg = bg == 'none' ? 0 : bg
   if has('gui_running') || has('termguicolors') && &termguicolors || has('nvim') && $NVIM_TUI_ENABLE_TRUE_COLOR
-    if a:coeff < 0 && exists('g:limelight_conceal_guifg')
-      let dim = g:limelight_conceal_guifg
-    elseif empty(fg) || empty(bg)
-      throw s:unsupported()
-    else
-      let coeff = s:coeff(a:coeff)
-      let fg_rgb = s:hex2rgb(fg)
-      let bg_rgb = s:hex2rgb(bg)
-      let dim_rgb = [
-            \ bg_rgb[0] * coeff + fg_rgb[0] * (1 - coeff),
-            \ bg_rgb[1] * coeff + fg_rgb[1] * (1 - coeff),
-            \ bg_rgb[2] * coeff + fg_rgb[2] * (1 - coeff)]
-      let dim = '#'.join(map(dim_rgb, 'printf("%x", float2nr(v:val))'), '')
-    endif
-    execute printf('hi LimelightDim guifg=%s guisp=bg', dim)
-  elseif &t_Co == 256
-    if a:coeff < 0 && exists('g:limelight_conceal_ctermfg')
-      let dim = g:limelight_conceal_ctermfg
-    elseif fg <= -1 || bg <= -1
-      throw s:unsupported()
-    else
-      let coeff = s:coeff(a:coeff)
-      let fg = s:gray_contiguous(fg)
-      let bg = s:gray_contiguous(bg)
-      let dim = s:gray_ansi(float2nr(bg * coeff + fg * (1 - coeff)))
-    endif
+    let dim = g:limelight_conceal_guifg
     if type(dim) == 1
       execute printf('hi LimelightDim ctermfg=%s', dim)
     else
